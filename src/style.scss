@@ -1,0 +1,353 @@
+// Target the block's main wrapper
+.wp-block-job-listings-block {
+    // This targets the wrapper added by get_block_wrapper_attributes()
+
+    // Reset and base styles within the container
+    .job-listings-container * {
+        box-sizing: border-box;
+        // Keep resets minimal if inheriting theme styles
+        // margin: 0;
+        // padding: 0;
+    }
+
+    .job-listings-container {
+        // REMOVED: font-family declaration to inherit from theme.
+        background-color: #fdfaf6; // Or choose a background suitable for the theme
+        padding: 25px;
+        border-radius: 8px;
+        margin-top: 1em;
+        margin-bottom: 1em;
+    }
+
+    // === Styling for Job Count Heading ===
+    .job-count-heading {
+        font-size: 1.6rem;   // Example heading size (adjust to match theme H2/H3)
+        font-weight: 600;  // Semi-bold heading weight
+        color: #2d1f4c;     // Use a prominent color (e.g., title color)
+        margin-bottom: 25px; // Space below the heading
+        padding-bottom: 15px;// Space before the filter line
+        border-bottom: 1px solid #eee; // Optional separator below heading
+        text-align: left;     // Default alignment
+
+        @media (max-width: 600px) {
+            font-size: 1.5rem; // Slightly smaller on mobile
+            text-align: center; // Center on mobile if desired
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+    }
+
+    /* Filters Section - Adjusted */
+    .filters-section {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px; // Gap between label/dropdowns
+        align-items: center; // Vertically align items
+        margin-bottom: 35px;
+        // REMOVED border-bottom & padding-bottom, now handled by heading
+    }
+
+    // REMOVED: .filter-header styles
+
+    // Style for the "Filter by" Label - Re-add margin if needed
+    .filter-label {
+        font-weight: 500;
+        color: #444; // Match count color or adjust
+        margin-right: 10px; // Add space between label and first dropdown
+        padding-bottom: 0;
+        line-height: 1.3;
+        flex-shrink: 0;
+    }
+
+    // REMOVED: Old .job-count-display styles
+
+    // Filter dropdown styles remain largely the same
+    .filter-dropdown {
+        display: flex;
+        align-items: center;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 8px 12px;
+        position: relative;
+        min-width: 200px;
+        flex-grow: 1;
+        max-width: 320px;
+
+        // SVG styles inside dropdown
+        svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            fill: #8a3ffc; // Purple color from example
+            flex-shrink: 0;
+        }
+        // Select styles inside dropdown
+        select {
+             border: none;
+            outline: none; // We'll add custom focus styles
+            background-color: transparent;
+            flex-grow: 1;
+            font-size: 1rem; // Inherit font size or set specifically
+            color: #333; // Dark color for text
+            font-weight: 500; // Medium weight for dropdown text
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            padding-right: 30px;
+             // Custom arrow using purple color
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%238a3ffc'%3E%3Cpath fill-rule='evenodd' d='M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z' clip-rule='evenodd' /%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px 16px;
+            width: 100%;
+            border-radius: 3px; // Slight rounding for focus outline
+            padding-left: 5px; // Add padding for text
+
+            // --- Accessibility: Focus Indicator ---
+            &:focus-visible { // Modern browsers: only show on keyboard focus
+                outline: 2px solid #8a3ffc; // Use matching color
+                outline-offset: 1px;
+                box-shadow: 0 0 0 2px rgba(138, 63, 252, 0.3);
+            }
+             // Fallback for older browsers (might show on mouse click too)
+            &:focus {
+                outline: 2px solid #8a3ffc; // Use matching color
+                outline-offset: 1px;
+                box-shadow: 0 0 0 2px rgba(138, 63, 252, 0.3);
+            }
+        }
+    }
+
+
+    /* Job List */
+    .job-list {
+        display: grid;
+        gap: 1px;
+        background-color: #eee; // Line color
+        border: 1px solid #eee;
+        border-radius: 6px;
+        overflow: hidden; // Important for border-radius with background gaps
+    }
+
+    /* Individual Job Item */
+    .job-item {
+        background-color: #fff; // White background for item
+        padding: 25px;
+        display: grid;
+        grid-template-columns: 1fr; // Mobile first
+        gap: 15px 20px;
+        align-items: center; // Default vertical alignment for mobile
+        transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out, padding 0.3s ease-in-out, margin 0.3s ease-in-out, visibility 0s linear 0.3s; // Delay visibility change
+        overflow: hidden; // For transitions
+
+        // Styles for when hidden
+        &.hidden {
+            opacity: 0;
+            padding-top: 0 !important; // Use !important defensively if needed
+            padding-bottom: 0 !important;
+            margin-top: -1px !important; // Adjust for gap
+            border-width: 0 !important;
+            max-height: 0 !important; // Use max-height for smooth transition
+            pointer-events: none;
+            visibility: hidden; // Ensure fully hidden for accessibility/layout
+            transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out, padding 0.3s ease-in-out, margin 0.3s ease-in-out, visibility 0s linear 0.3s; // Ensure visibility transition happens last
+        }
+    }
+
+     /* Job Details Area */
+    .job-details {
+       // Container
+    }
+
+    // Spacing container for tags
+     .job-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0; // Use margin on the tags themselves for spacing
+        margin-bottom: 8px; // Space below the tags row
+    }
+
+    // Style metadata tags like rounded labels
+    .job-department,
+    .job-employment-type {
+        font-size: 0.8rem;     // Slightly smaller font
+        color: #ffffff;        // White text color
+        font-weight: 500;      // Medium weight
+        background-color: #8a3ffc; // Purple background (matches icons/links)
+        border-radius: 12px;   // Rounded corners
+        padding: 4px 12px;    // Vertical and horizontal padding
+        line-height: 1.4;
+        text-align: center;
+        display: inline-block; // Ensure background covers text properly
+        margin-right: 8px;     // Space between tags
+        margin-bottom: 5px;    // Space if they wrap
+        border: none; // Remove previous border if any
+    }
+
+
+    // Style Job Title like the screenshot's heading
+    .job-title {
+        font-size: 1.25rem; // Match heading size (adjust as needed)
+        font-weight: 700; // <<< BOLD weight
+        color: #2d1f4c; // Dark purple color from screenshot
+        margin-bottom: 8px;
+        // font-family: inherit; // Should inherit by default
+    }
+
+    /* Description snippet (hidden by default unless CSS changed) */
+    .job-description-snippet {
+        display: none; // Keep hidden unless needed
+        font-size: 0.9rem;
+        color: #555;
+        margin-top: 5px;
+        margin-bottom: 10px;
+        line-height: 1.5;
+    }
+
+     /* Location Info Area */
+    .job-location-info {
+       text-align: left; // Default
+    }
+
+   // Style Location Label like the screenshot
+   .job-location-label {
+        font-size: 0.95rem; // <<< INCREASED Font size
+        color: #5a6168; // <<< SLIGHTLY DARKER Grey color
+        font-weight: 400; // Normal weight
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    // Style Location Value like the screenshot (bold)
+    .job-location {
+        font-weight: 700; // <<< BOLD weight
+        color: #2d1f4c; // Dark purple color
+        font-size: 1rem; // Adjust size if needed
+    }
+
+    /* Link Wrapper Area */
+    .job-link-wrapper {
+        text-align: left; // Default
+    }
+
+    // Style Learn More link like the screenshot
+    .job-link {
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+        color: #8a3ffc; // Purple color
+        font-weight: 600; // <<< Medium-Bold weight
+        transition: color 0.2s ease, box-shadow 0.2s ease, outline 0.2s ease;
+        white-space: nowrap;
+        border-radius: 3px; // For focus style consistency
+        padding: 2px 4px; // Add padding for focus outline space
+        margin: -2px -4px; // Counteract padding for layout
+
+        // --- Accessibility: Focus Indicator ---
+        &:focus-visible { // Modern browsers: only show on keyboard focus
+            outline: 2px solid #8a3ffc;
+            outline-offset: 1px;
+            box-shadow: 0 0 0 2px rgba(138, 63, 252, 0.3);
+        }
+         // Fallback for older browsers
+        &:focus {
+            outline: 2px solid #8a3ffc;
+            outline-offset: 1px;
+            box-shadow: 0 0 0 2px rgba(138, 63, 252, 0.3);
+        }
+
+
+        &:hover {
+            color: #6a2ac8; // Darker purple
+            text-decoration: underline; // Add underline on hover
+
+            svg {
+                 transform: translateX(3px);
+            }
+        }
+
+        [dir="rtl"] &:hover svg {
+             transform: translateX(-3px);
+        }
+
+        svg {
+            width: 18px;
+            height: 18px;
+            margin-left: 6px;
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+             fill: currentColor; // Make arrow match link color
+
+            [dir="rtl"] & {
+                margin-left: 0;
+                margin-right: 6px;
+            }
+        }
+    }
+
+
+    /* --- Responsive Adjustments --- */
+
+    /* Layout for wider screens */
+    @media (min-width: 768px) {
+        .job-item {
+            grid-template-columns: minmax(0, 3fr) minmax(0, 1.5fr) minmax(0, 1fr);
+            gap: 15px 30px;
+            align-items: center; // <<< CENTER VERTICALLY ON DESKTOP
+        }
+        .job-location-info {
+            text-align: left; // Keep left aligned on desktop
+        }
+        .job-link-wrapper {
+            text-align: right; // Align link right on desktop
+            margin-top: 0; // Reset margin if needed
+        }
+    }
+
+    /* Responsive Filters & Item adjustments */
+    @media (max-width: 600px) {
+         // Job count heading already handled above
+        .filters-section {
+            align-items: stretch; // Make items full width when stacked
+            gap: 10px; // Adjust gap for stacking
+        }
+         // REMOVED: .filter-header responsive styles
+        .filter-label {
+             margin-bottom: 5px; // Space below label when stacked
+             margin-right: 0;
+             text-align: center;
+             [dir="rtl"] & { // Basic RTL support for label centering
+                margin-left: 0;
+             }
+        }
+         // REMOVED: .job-count-display responsive styles
+        .filter-dropdown {
+            max-width: none; // Allow full width
+        }
+        .job-item {
+            padding: 20px;
+        }
+        .job-link-wrapper {
+             margin-top: 10px;
+             text-align: left; // Keep left aligned on mobile
+            [dir="rtl"] & {
+                 text-align: right;
+            }
+        }
+    }
+
+     // Styling for the "No Jobs Found" message
+    .no-jobs-found-message {
+        text-align: center;
+        padding: 40px 20px; // Add padding top/bottom
+        font-size: 1.3rem;  // Larger font size
+        font-weight: 500;  // Medium weight
+        color: #2d1f4c;    // Match job title color
+        margin-top: 20px;  // Space above the message
+        // REMOVED border-top to rely on heading's border
+        display: none; // Hidden by default (JS controls visibility)
+    }
+
+} // End of .wp-block-job-listings-block wrapper

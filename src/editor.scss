@@ -1,0 +1,24 @@
+// Add specific styles for the editor interface if needed
+.wp-block-job-listings-block { // Class automatically added by WP
+	border: 1px dashed #ccc;
+	padding: 15px;
+    background-color: #f9f9f9;
+}
+
+// Style for the individual job panels in the inspector
+.job-listings-block-job-panel .components-panel__body-title button {
+    font-size: 0.9em; // Make panel titles slightly smaller
+}
+.job-listings-block-job-panel {
+    border-left: 3px solid #eee;
+    margin-bottom: 10px !important; // Ensure space between panels
+    padding-left: 5px !important; // Give a bit of inset
+    background-color: #fff; // White background for job panels
+
+    // Target the actual body content, not just the header
+    .components-panel__body {
+        margin: 0 !important; // Remove default margin if needed
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
+    }
+}

@@ -1,0 +1,37 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "job-listings/block",
+	"version": "1.0.0",
+	"title": "Job Listings",
+	"category": "widgets",
+	"icon": "list-view",
+	"description": "Displays filterable job listings managed within the editor.",
+	"example": {},
+	"supports": {
+		"html": false,
+		"align": ["wide", "full"]
+	},
+	"attributes": {
+		"jobs": {
+			"type": "array",
+			"default": [],
+			"items": {
+				"type": "object"
+            }
+		},
+        "hiringOrganizationName": {
+            "type": "string",
+            "default": "Your Company Name"
+        },
+        "hiringOrganizationUrl": {
+            "type": "string",
+            "default": "https://www.yourcompanywebsite.com"
+        }
+	},
+	"textdomain": "job-listings-block",
+	"editorScript": "file:./build/index.js",
+	"editorStyle": "file:./build/index.css",
+	"style": "file:./build/style-index.css",
+    "render": "file:./render.php"
+}
