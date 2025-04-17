@@ -78,13 +78,13 @@ There are two ways to install this plugin:
 ## Screenshots
 
 *   *Screenshot of the block added in the editor.*
-![Screenshot of the block added in the editor.](image.png)
+![Screenshot of the block added in the editor.](https://i.postimg.cc/vmMrPSbq/image.png)
 *   *Screenshot showing the Inspector Controls (sidebar options).*
-![Screenshot showing the Inspector Controls](image-1.png)
+![Screenshot showing the Inspector Controls](https://i.postimg.cc/zvRHDnqH/image-1.png)
 *   *Screenshot of the frontend display with filters and job list.*
-![Screenshot of the frontend display with filters and job list.](image-2.png)
+![Screenshot of the frontend display with filters and job list.](https://i.postimg.cc/SNCVD9cK/image-2.png)
 *   *Screenshot of the "No open position found" message.*
-![Screenshot of the frontend display with filters and job list.](image-3.png)
+![Screenshot of the frontend display with filters and job list.](https://i.postimg.cc/YC7RVSxz/image-3.png)
 
 ## Changelog
 
