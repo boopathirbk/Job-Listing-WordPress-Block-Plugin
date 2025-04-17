@@ -22,11 +22,11 @@
 		},
         "hiringOrganizationName": {
             "type": "string",
-            "default": "Your Company Name"
+            "default": "Boopathi R"
         },
         "hiringOrganizationUrl": {
             "type": "string",
-            "default": "https://www.yourcompanywebsite.com"
+            "default": ""
         }
 	},
 	"textdomain": "job-listings-block",
