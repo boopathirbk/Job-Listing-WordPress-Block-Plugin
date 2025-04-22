@@ -30,11 +30,11 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listi
 
         <h2 id="job-count-<?php echo esc_attr( $unique_id_base ); ?>" class="job-count-heading">
             <?php
-                /* translators: %d: Number of open positions. */ // Translator Comment for _n()
-                printf(
-                    esc_html( _n( '%d Open Position', '%d Open Positions', $total_jobs_count, 'job-listings-block' ) ),
-                    (int) $total_jobs_count
-                );
+             /* translators: %d: Number of open positions. */ // <--- MUST be right here
+            printf(
+                esc_html( _n( '%d Open Position', '%d Open Positions', $total_jobs_count, 'job-listings-block' ) ),
+                (int) $total_jobs_count
+            );
             ?>
         </h2>
 
@@ -108,7 +108,7 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listi
 						<div class="job-location-info">
 							<span class="job-location-label"><?php esc_html_e( 'Location', 'job-listings-block' ); ?></span>
                             <?php // $job_location_display is pre-escaped string ?>
-							<span class="job-location"><?php echo $job_location_display; ?></span>
+							<span class="job-location"><?php echo esc_html( $job_location_display ); // FIXED: Escape the final string ?></span>
 						</div>
 						<div class="job-link-wrapper">
                             <?php // Conditionally output target/rel attributes, href is escaped. ?>
