@@ -2,38 +2,37 @@ import { __ } from '@wordpress/i18n';
 import {
 	useBlockProps,
 	InspectorControls,
-	RichText, // If you want rich text descriptions
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
 	TextControl,
-	TextareaControl, // Use if you want simple text area for description
+	TextareaControl,
 	Button,
 	SelectControl,
 	Notice,
-    __experimentalHeading as Heading, // Use Heading component for better structure
-    Flex, // For layouting buttons etc.
-    FlexItem
+    __experimentalHeading as Heading,
+    ToggleControl // <-- Added Import
 } from '@wordpress/components';
-import './editor.scss'; // Editor-specific styles
+import './editor.scss';
 
 export default function Edit({ attributes, setAttributes }) {
 	const { jobs = [], hiringOrganizationName, hiringOrganizationUrl } = attributes;
 
-	const blockProps = useBlockProps(); // Get block props for wrapper
+	const blockProps = useBlockProps();
 
     // --- Job Management Functions ---
 	const addJob = () => {
 		const newJobs = [
 			...jobs,
 			{
-				id: `job-${Date.now()}`, // Simple unique ID
+				id: `job-${Date.now()}`,
 				title: '',
 				department: '',
-				location: '',
-                employmentType: 'Full-time', // Default type
+				locations: [], // <-- Changed: Default locations to empty array
+                employmentType: 'Full-time',
                 description: '',
 				url: '',
+                openInNewTab: false, // <-- Added: Default link target
 			},
 		];
 		setAttributes({ jobs: newJobs });
@@ -42,6 +41,14 @@ export default function Edit({ attributes, setAttributes }) {
 	const updateJob = (index, key, value) => {
 		const newJobs = jobs.map((job, i) => {
 			if (i === index) {
+                // Handle locations array from textarea
+                if (key === 'locationsText') {
+                    const locationsArray = value
+                        .split('\n') // Split by newline
+                        .map(loc => loc.trim()) // Trim whitespace
+                        .filter(Boolean); // Remove empty lines
+                    return { ...job, locations: locationsArray };
+                }
 				return { ...job, [key]: value };
 			}
 			return job;
@@ -54,14 +61,12 @@ export default function Edit({ attributes, setAttributes }) {
 		setAttributes({ jobs: newJobs });
 	};
 
-    // --- Department & Location Options (derived from current jobs for SelectControls) ---
-    const getUniqueValues = (key) => {
-        const values = new Set(jobs.map(job => job[key]?.trim()).filter(Boolean));
-        return Array.from(values).map(value => ({ label: value, value: value }));
+    // --- Department Options (derived from current jobs) ---
+    const getUniqueDepartments = () => {
+        const values = new Set(jobs.map(job => job.department?.trim()).filter(Boolean));
+        return Array.from(values).sort().map(value => ({ label: value, value: value }));
     }
-    const departmentOptions = [{ label: __('Select Department...'), value: '' }, ...getUniqueValues('department')];
-    const locationOptions = [{ label: __('Select Location...'), value: '' }, ...getUniqueValues('location')];
-
+    const departmentOptions = [{ label: __('Select Department...'), value: '' }, ...getUniqueDepartments()];
 
 	return (
 		<>
@@ -78,6 +83,7 @@ export default function Edit({ attributes, setAttributes }) {
 						label={__('Organization Website URL', 'job-listings-block')}
 						value={hiringOrganizationUrl}
 						onChange={(value) => setAttributes({ hiringOrganizationUrl: value })}
+                        type="url" // Use url type for better validation
                         help={__('Used for SEO Schema.', 'job-listings-block')}
 					/>
                 </PanelBody>
@@ -97,29 +103,23 @@ export default function Edit({ attributes, setAttributes }) {
 								onChange={(value) => updateJob(index, 'title', value)}
 								required
 							/>
-                            {/* Example using SelectControl for Departments - or use TextControl if preferred */}
-                            <SelectControl
-                                label={__('Department', 'job-listings-block')}
-                                value={job.department}
-                                options={departmentOptions}
-                                onChange={(value) => updateJob(index, 'department', value)}
-                                help={__('Select or type a new department.', 'job-listings-block')}
-                                // __nextHasNoMarginBottom // Optional: if using newer WP versions
-                            />
-                             {/* Allow typing new department if SelectControl doesn't cover it */}
                             <TextControl
-								label={__('Department (if not listed)', 'job-listings-block')}
+								label={__('Department', 'job-listings-block')}
 								value={job.department}
 								onChange={(value) => updateJob(index, 'department', value)}
+                                required
 							/>
 
-							<TextControl
-								label={__('Location', 'job-listings-block')}
-								value={job.location}
-								onChange={(value) => updateJob(index, 'location', value)}
-                                help={__('E.g., "City, Country" or "Multiple Locations"', 'job-listings-block')}
-								required
-							/>
+                            {/* Feature 3: Textarea for Multiple Locations */}
+                            <TextareaControl
+                                label={__('Locations (One per line)', 'job-listings-block')}
+                                value={(job.locations || []).join('\n')} // Join array for textarea display
+                                onChange={(value) => updateJob(index, 'locationsText', value)} // Use temporary key
+                                help={__('Enter each location on a new line. E.g., "City, Country".', 'job-listings-block')}
+                                required
+                                rows={3} // Adjust rows as needed
+                            />
+
                             <SelectControl
                                 label={__('Employment Type', 'job-listings-block')}
                                 value={job.employmentType}
@@ -146,13 +146,14 @@ export default function Edit({ attributes, setAttributes }) {
 								type="url"
 								required
 							/>
-							<Button
-                                isDestructive
-                                isSmall // Use isSmall for less visual weight
-                                variant="secondary" // Use secondary for less emphasis than primary action
-								onClick={() => removeJob(index)}
-                                style={{ marginTop: '10px' }} // Add some space
-							>
+                            {/* Feature 1: Link Target Toggle */}
+                            <ToggleControl
+                                label={__('Open link in new tab', 'job-listings-block')}
+                                checked={!!job.openInNewTab} // Ensure boolean
+                                onChange={(value) => updateJob(index, 'openInNewTab', value)}
+                            />
+
+							<Button isDestructive isSmall variant="secondary" onClick={() => removeJob(index)} style={{ marginTop: '10px' }}>
 								{__('Remove Job', 'job-listings-block')} {index + 1}
 							</Button>
 						</PanelBody>
@@ -162,8 +163,6 @@ export default function Edit({ attributes, setAttributes }) {
 						{__('Add Job', 'job-listings-block')}
 					</Button>
 				</PanelBody>
-
-
 			</InspectorControls>
 
 			{/* Block Editor Preview Area */}
@@ -173,12 +172,6 @@ export default function Edit({ attributes, setAttributes }) {
                     <p>{__('Add jobs using the sidebar controls.', 'job-listings-block')}</p>
                 ) : (
                     <p>{`${jobs.length} ${jobs.length === 1 ? __('job') : __('jobs')} configured. See frontend for full preview with filters.`}</p>
-                    // Optional: Render a simplified list here for visual feedback
-                    /*<ul>
-                        {jobs.map((job, index) => (
-                            <li key={job.id || index}><strong>{job.title || '(Untitled)'}</strong> - {job.location || '(No location)'}</li>
-                        ))}
-                    </ul>*/
                 )}
 			</div>
 		</>
