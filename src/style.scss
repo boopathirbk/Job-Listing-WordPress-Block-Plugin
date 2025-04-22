@@ -8,27 +8,28 @@
     }
 
     .job-listings-container {
-        background-color: #fdfaf6;
+        // REMOVED: font-family declaration to inherit from theme.
+        background-color: #fdfaf6; // Or choose a background suitable for the theme
         padding: 25px;
         border-radius: 8px;
         margin-top: 1em;
         margin-bottom: 1em;
     }
 
-    // Styling for Job Count Heading
+    // === Styling for Job Count Heading ===
     .job-count-heading {
-        font-size: 1.6rem;
-        font-weight: 600;
-        color: #2d1f4c;
-        margin-bottom: 25px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid #eee;
-        text-align: left;
+        font-size: 1.6rem;   // Example heading size (adjust to match theme H2/H3)
+        font-weight: 600;  // Semi-bold heading weight
+        color: #2d1f4c;     // Use a prominent color (e.g., title color)
+        margin-bottom: 25px; // Space below the heading
+        padding-bottom: 15px;// Space before the filter line
+        border-bottom: 1px solid #eee; // Optional separator below heading
+        text-align: left;     // Default alignment
         line-height: 1.4;
 
         @media (max-width: 600px) {
-            font-size: 1.5rem;
-            text-align: center;
+            font-size: 1.5rem; // Slightly smaller on mobile
+            text-align: center; // Center on mobile if desired
             margin-bottom: 20px;
             padding-bottom: 10px;
         }
@@ -107,7 +108,7 @@
         }
     }
 
-    // === Feature 2: Clear Filters Button Styling ===
+    // Clear Filters Button Styling
     .clear-filters-button {
         background-color: #f8f9fa; // Light background
         border: 1px solid #dee2e6;
@@ -158,36 +159,184 @@
     }
 
     /* Job List */
-    .job-list { /* ... Keep existing styles ... */ }
+    .job-list {
+        display: grid;
+        gap: 1px;
+        background-color: #eee; // Line color
+        border: 1px solid #eee;
+        border-radius: 6px;
+        overflow: hidden;
+    }
 
     /* Individual Job Item */
-    .job-item { /* ... Keep existing styles ... */ }
-    .job-item.hidden { /* ... Keep existing styles ... */ }
-    .job-details { /* ... Keep existing styles ... */ }
-    .job-meta { /* ... Keep existing styles ... */ }
+    .job-item {
+        background-color: #fff;
+        padding: 25px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px 20px;
+        align-items: center;
+        transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out, padding 0.3s ease-in-out, margin 0.3s ease-in-out, visibility 0s linear 0.3s;
+        overflow: hidden;
+
+        &.hidden {
+            opacity: 0;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            margin-top: -1px !important;
+            border-width: 0 !important;
+            max-height: 0 !important;
+            pointer-events: none;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out, padding 0.3s ease-in-out, margin 0.3s ease-in-out, visibility 0s linear 0.3s;
+        }
+    }
+
+     /* Job Details Area */
+    .job-details { }
+
+    // Spacing container for tags
+     .job-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0;
+        margin-bottom: 8px;
+    }
+
+    // Style metadata tags like rounded labels
     .job-department,
-    .job-employment-type { /* ... Keep existing styles ... */ }
-    .job-title { /* ... Keep existing styles ... */ }
-    .job-description-snippet { /* ... Keep existing styles ... */ }
-    .job-location-info { /* ... Keep existing styles ... */ }
-    .job-location-label { /* ... Keep existing styles ... */ }
-    .job-location { /* ... Keep existing styles ... */ }
-    .job-link-wrapper { /* ... Keep existing styles ... */ }
-    .job-link { /* ... Keep existing styles ... */ }
+    .job-employment-type {
+        font-size: 0.8rem;
+        color: #ffffff;
+        font-weight: 500;
+        background-color: #8a3ffc;
+        border-radius: 12px;
+        padding: 4px 12px;
+        line-height: 1.4;
+        text-align: center;
+        display: inline-block;
+        margin-right: 8px;
+        margin-bottom: 5px;
+        border: none;
+    }
+
+
+    // Style Job Title
+    .job-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #2d1f4c;
+        margin-bottom: 8px;
+    }
+
+    /* Description snippet */
+    .job-description-snippet {
+        display: none;
+        font-size: 0.9rem;
+        color: #555;
+        margin-top: 5px;
+        margin-bottom: 10px;
+        line-height: 1.5;
+    }
+
+     /* Location Info Area */
+    .job-location-info {
+       text-align: left;
+    }
+
+   // Style Location Label
+   .job-location-label {
+        font-size: 0.95rem;
+        color: #5a6168;
+        font-weight: 400;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    // Style Location Value
+    .job-location {
+        font-weight: 700;
+        color: #2d1f4c;
+        font-size: 1rem;
+    }
+
+    /* Link Wrapper Area */
+    .job-link-wrapper {
+        text-align: left;
+    }
+
+    // Style Learn More link
+    .job-link {
+        display: inline-flex;
+        align-items: center;
+        text-decoration: none;
+        color: #8a3ffc;
+        font-weight: 600;
+        transition: color 0.2s ease, box-shadow 0.2s ease, outline 0.2s ease;
+        white-space: nowrap;
+        border-radius: 3px;
+        padding: 2px 4px;
+        margin: -2px -4px;
+
+        &:focus-visible {
+            outline: 2px solid #8a3ffc;
+            outline-offset: 1px;
+            box-shadow: 0 0 0 2px rgba(138, 63, 252, 0.3);
+        }
+        &:focus {
+            outline: 2px solid #8a3ffc;
+            outline-offset: 1px;
+            box-shadow: 0 0 0 2px rgba(138, 63, 252, 0.3);
+        }
+
+        &:hover {
+            color: #6a2ac8;
+            text-decoration: underline;
+            svg { transform: translateX(3px); }
+        }
+        [dir="rtl"] &:hover svg { transform: translateX(-3px); }
+
+        svg {
+            width: 18px;
+            height: 18px;
+            margin-left: 6px;
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+            fill: currentColor;
+            [dir="rtl"] & { margin-left: 0; margin-right: 6px; }
+        }
+    }
 
     /* --- Responsive Adjustments --- */
     @media (min-width: 768px) {
-        .job-item { /* ... Keep existing styles ... */ }
-        .job-location-info { /* ... Keep existing styles ... */ }
-        .job-link-wrapper { /* ... Keep existing styles ... */ }
+        .job-item {
+            grid-template-columns: minmax(0, 3fr) minmax(0, 1.5fr) minmax(0, 1fr);
+            gap: 15px 30px;
+            align-items: center;
+        }
+        .job-location-info { text-align: left; }
+        .job-link-wrapper { text-align: right; margin-top: 0; }
     }
-    @media (max-width: 600px) { // Note: button responsive handled above in its own section
-         .filters-section { /* ... Keep existing styles ... */ }
-         .filter-label { /* ... Keep existing styles ... */ }
-         .filter-dropdown { /* ... Keep existing styles ... */ }
-         .job-item { /* ... Keep existing styles ... */ }
-         .job-link-wrapper { /* ... Keep existing styles ... */ }
+    @media (max-width: 600px) {
+        // Count heading responsive styles are within its own rule above
+        .filters-section { align-items: stretch; gap: 10px; }
+        .filter-label { margin-bottom: 5px; margin-right: 0; text-align: center; [dir="rtl"] & { margin-left: 0; } }
+        .filter-dropdown { max-width: none; }
+        // Clear button responsive styles are within its own rule above
+        .job-item { padding: 20px; }
+        .job-link-wrapper { margin-top: 10px; text-align: left; [dir="rtl"] & { text-align: right; } }
     }
-    .no-jobs-found-message { /* ... Keep existing styles ... */ }
+
+     // Styling for the "No Jobs Found" message
+    .no-jobs-found-message {
+        text-align: center;
+        padding: 40px 20px;
+        font-size: 1.3rem;
+        font-weight: 500;
+        color: #2d1f4c;
+        margin-top: 20px;
+        // Removed border-top, relies on heading border
+        display: none;
+    }
 
 } // End of .wp-block-job-listings-block wrapper
