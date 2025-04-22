@@ -32,7 +32,7 @@ There are two ways to install this plugin:
 
 **Method 1: Using the Release ZIP (Recommended for Users)**
 
-1.  Go to the **[Releases](https://github.com/boopathirbk/Job-Listing-WordPress-Block-Plugin)** page of this repository (Replace `YourUsername/job-listings-block` with your actual repo path).
+1.  Go to the **[Releases](https://github.com/boopathirbk/Job-Listing-WordPress-Block-Plugin/releases)** page of this repository.
 2.  Download the latest `.zip` file from the Assets section (e.g., `job-listings-block.zip`).
 3.  Log in to your WordPress admin dashboard.
 4.  Navigate to **Plugins** -> **Add New**.
@@ -114,4 +114,4 @@ There are two ways to install this plugin:
 ## License
 
 This plugin is licensed under the GPL-2.0-or-later.
-See the [LICENSE](https://www.gnu.org/licenses/gpl-2.0.html) file for details (or create a LICENSE file in your repo).
+See the [LICENSE](https://www.gnu.org/licenses/gpl-2.0.html) file for details.
