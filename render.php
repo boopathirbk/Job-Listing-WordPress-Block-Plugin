@@ -30,11 +30,11 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listi
 
         <h2 id="job-count-<?php echo esc_attr( $unique_id_base ); ?>" class="job-count-heading">
             <?php
-             /* translators: %d: Number of open positions. */ // <--- MUST be right here
-            printf(
-                esc_html( _n( '%d Open Position', '%d Open Positions', $total_jobs_count, 'job-listings-block' ) ),
-                (int) $total_jobs_count
-            );
+                /* translators: %d: Number of open positions. */ // <-- Translator Comment Correctly Placed
+                printf(
+                    esc_html( _n( '%d Open Position', '%d Open Positions', $total_jobs_count, 'job-listings-block' ) ),
+                    (int) $total_jobs_count
+                );
             ?>
         </h2>
 
@@ -74,7 +74,7 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listi
                     $job_department_slug = sanitize_title( $job_department_raw );
                     $job_locations_raw = isset( $job['locations'] ) && is_array($job['locations']) ? $job['locations'] : [];
                     $job_locations_display_array = array_map('esc_html', $job_locations_raw); // Pre-escape for implode safety
-                    $job_location_display = implode(', ', $job_locations_display_array);
+                    $job_location_display = implode(', ', $job_locations_display_array); // This is now HTML-safe
                     $location_slugs = implode(',', array_map('sanitize_title', $job_locations_raw));
                     $job_employment_type_raw = isset($job['employmentType']) ? $job['employmentType'] : 'Full-time';
                     $job_description_raw = isset($job['description']) ? $job['description'] : '';
@@ -107,8 +107,7 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listi
 						</div>
 						<div class="job-location-info">
 							<span class="job-location-label"><?php esc_html_e( 'Location', 'job-listings-block' ); ?></span>
-                            <?php // $job_location_display is pre-escaped string ?>
-							<span class="job-location"><?php echo esc_html( $job_location_display ); // FIXED: Escape the final string ?></span>
+							<span class="job-location"><?php echo esc_html( $job_location_display ); // Escaping the final imploded string ?></span>
 						</div>
 						<div class="job-link-wrapper">
                             <?php // Conditionally output target/rel attributes, href is escaped. ?>
@@ -237,39 +236,36 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listi
                         });
 
                         // Filter out duplicate display texts before sorting and adding options
-                        const uniqueDisplayLocations = [...new Map(locations).values()];
-                        const sortedLocations = uniqueDisplayLocations.sort((a, b) => a.localeCompare(b));
+                        const uniqueLocationEntries = Array.from(new Map( // Create map from slug -> display text
+                            [...locations.entries()].map(([slug, text]) => [text, slug]) // Reverse: display text -> first slug
+                        ).entries()).map(([text, slug]) => [slug, text]); // Convert back: first slug -> display text
 
-                        const uniqueDisplayDepartments = [...new Map(departments).values()];
-                        const sortedDepartments = uniqueDisplayDepartments.sort((a, b) => a.localeCompare(b));
+                        const sortedLocations = uniqueLocationEntries.sort((a, b) => a[1].localeCompare(b[1])); // Sort by display text
+
+                        const uniqueDepartmentEntries = Array.from(new Map(
+                            [...departments.entries()].map(([slug, text]) => [text, slug])
+                        ).entries()).map(([text, slug]) => [slug, text]);
+
+                        const sortedDepartments = uniqueDepartmentEntries.sort((a, b) => a[1].localeCompare(b[1]));
 
 
                         while (locationFilter.options.length > 1) locationFilter.remove(1);
                         while (departmentFilter.options.length > 1) departmentFilter.remove(1);
 
                         // Add unique locations based on display text
-                        sortedLocations.forEach((text) => {
-                             // Find the first slug associated with this display text
-                            const matchingEntry = [...locations.entries()].find(entry => entry[1] === text);
-                            if (matchingEntry) {
-                                const value = matchingEntry[0]; // Use the slug as the value
-                                const option = document.createElement('option');
-                                option.value = value;
-                                option.textContent = text; // Display the text
-                                locationFilter.appendChild(option);
-                            }
+                        sortedLocations.forEach(([value, text]) => { // Value is the slug, Text is the display text
+                            const option = document.createElement('option');
+                            option.value = value;
+                            option.textContent = text;
+                            locationFilter.appendChild(option);
                         });
 
                         // Add unique departments based on display text
-                        sortedDepartments.forEach((text) => {
-                            const matchingEntry = [...departments.entries()].find(entry => entry[1] === text);
-                            if (matchingEntry) {
-                                const value = matchingEntry[0]; // Use the slug as value
-                                const option = document.createElement('option');
-                                option.value = value;
-                                option.textContent = text;
-                                departmentFilter.appendChild(option);
-                            }
+                        sortedDepartments.forEach(([value, text]) => {
+                            const option = document.createElement('option');
+                            option.value = value;
+                            option.textContent = text;
+                            departmentFilter.appendChild(option);
                         });
                     }
                     // --- End dynamic population ---
