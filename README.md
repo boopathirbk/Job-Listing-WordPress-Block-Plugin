@@ -25,6 +25,7 @@ This plugin provides a custom Gutenberg block that allows users to easily add an
 ## Requirements
 
 *   WordPress 6.0 or higher
+*   Tested up to WordPress 6.8
 *   PHP 7.4 or higher
 
 ## Installation

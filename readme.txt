@@ -1,9 +1,9 @@
 === Job Listings Block ===
 Contributors: buofshangrila
 Donate link: https://paypal.me/boopathirbk
-Tags: block, gutenberg, jobs, listings, careers, location filter
-Requires at least: 6.0
+Tags: block, gutenberg, jobs, listings, careers
 Tested up to: 6.8
+Requires at least: 6.0
 Requires PHP: 7.4
 Stable tag: 1.1.1
 License: GPLv2 or later
