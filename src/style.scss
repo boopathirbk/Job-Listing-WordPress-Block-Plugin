@@ -33,7 +33,7 @@
         }
     }
 
-    // Clear Filters Button Styling
+    // UPDATED: Clear Filters Button Styling (Mimics Dropdown Closer)
     .clear-filters-button {
         display: inline-flex; // JS toggles between 'none' and 'inline-flex'
         align-items: center;
@@ -131,7 +131,7 @@
      // Styling for the "No Jobs Found" message
     .no-jobs-found-message {
         text-align: center; padding: 40px 20px; font-size: 1.3rem; font-weight: 500; color: #2d1f4c;
-        margin-top: 20px; /* Removed border-top */; display: none;
+        margin-top: 20px; display: none;
     }
 
 } // End of .wp-block-job-listings-block wrapper

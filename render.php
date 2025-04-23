@@ -1,7 +1,7 @@
 <?php
 /**
  * PHP file to render the Job Listings Block on the frontend.
- * v1.1.3+ - Corrected translator comment placement.
+ * v1.1.4 - Run filter logic initially to set correct count.
  *
  * @package job-listings-block
  */
@@ -36,13 +36,13 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listi
 	<div class="job-listings-container">
 
         <h2 id="job-count-<?php echo esc_attr( $unique_id_base ); ?>" class="job-count-heading">
-        <?php
-            /* translators: %d: Number of open positions. */ // <-- Ensure comment is here
-            printf(
-                esc_html( _n( '%d Open Position', '%d Open Positions', $total_jobs_count, 'job-listings-block' ) ), // <-- Ensure text domain is correct
-                (int) $total_jobs_count
-            );
-        ?>
+            <?php
+                /* translators: %d: Number of open positions. */
+                printf(
+                    esc_html( _n( '%d Open Position', '%d Open Positions', $initial_rendered_item_count, 'job-listings-block' ) ),
+                    (int) $initial_rendered_item_count
+                );
+            ?>
         </h2>
 
 		<!-- Filters Section -->
@@ -93,7 +93,7 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listi
                     // Loop through each location to render an item
                     foreach ($job_locations_raw as $location_index => $single_location) {
                         $single_location_trimmed = trim($single_location);
-                        if (empty($single_location_trimmed)) continue; // Skip empty location lines
+                        if (empty($single_location_trimmed)) continue;
 
                         $single_location_slug = sanitize_title($single_location_trimmed);
                         $job_instance_id = $job_id_base . '-' . $single_location_slug;
@@ -117,7 +117,7 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listi
 						</div>
 						<div class="job-location-info">
 							<span class="job-location-label"><?php esc_html_e( 'Location', 'job-listings-block' ); ?></span>
-							<span class="job-location"><?php echo esc_html( $single_location_trimmed ); // Use the single location text ?></span>
+							<span class="job-location"><?php echo esc_html( $single_location_trimmed ); ?></span>
 						</div>
 						<div class="job-link-wrapper">
 							<a href="<?php echo esc_url( $job_url_raw ); ?>" class="job-link"<?php if ($open_in_new_tab) { echo ' target="_blank" rel="noopener noreferrer"'; } ?>>
@@ -151,8 +151,21 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listi
                  $url = isset( $job['url'] ) ? esc_url( $job['url'] ) : null;
                  $emp_type = isset($job['employmentType']) ? sanitize_text_field($job['employmentType']) : "Full-time";
                  if (!$title || !$url) continue;
-                 $schema_item = array( /* ... Schema structure ... */ );
-                 if ($loc_text && $loc_text !== 'Multiple Locations') { /* ... */ } else if ($loc_text === 'Multiple Locations') { /* ... */ } else { /* ... */ }
+                 $schema_item = array(
+                     "@context" => "https://schema.org/", "@type" => "JobPosting", "title" => $title, "description" => $desc,
+                     "hiringOrganization" => $hiring_org, "employmentType" => strtoupper( str_replace( '-', '_', $emp_type ) ),
+                     "datePosted" => $current_date, "url" => $url, "jobLocation" => array( "@type" => "Place" )
+                 );
+                  if ($loc_text && $loc_text !== 'Multiple Locations') {
+                      $parts = explode(',', $loc_text);
+                      $schema_item['jobLocation']['address'] = array("@type" => "PostalAddress");
+                      if(count($parts) > 0) $schema_item['jobLocation']['address']['addressLocality'] = trim($parts[0]);
+                      if(count($parts) > 1) $schema_item['jobLocation']['address']['addressCountry'] = trim($parts[count($parts) - 1]);
+                  } else if ($loc_text === 'Multiple Locations') {
+                       $schema_item['jobLocationType'] = "TELECOMMUTE";
+                       if (isset($schema_item['jobLocation']['address'])) unset($schema_item['jobLocation']['address']);
+                       $schema_item['jobLocation']['name'] = "Multiple Locations";
+                  } else { unset($schema_item['jobLocation']); }
                  $job_posting_schema[] = $schema_item;
              }
              if ( ! empty( $job_posting_schema ) ) { echo '<script type="application/ld+json">' . wp_json_encode( $job_posting_schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT ) . '</script>'; }
@@ -160,7 +173,7 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listi
              ?>
 
 
-            <!-- Filtering JavaScript -->
+            <!-- Filtering JavaScript (Run filterJobs initially) -->
 			<script id="job-filter-script-<?php echo esc_attr( $unique_id_base ); ?>">
 				// Wrap in IIFE to avoid global scope pollution and run immediately
                 (function() {
@@ -174,10 +187,9 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listi
 
                     if (!locationFilter || !departmentFilter || !jobList || !noJobsMessage || !jobCountDisplay || !clearButton) { return; }
 
-                    // Get all RENDERED job items (one per location instance)
-                    const jobItems = jobList.querySelectorAll('.job-item');
+                    const jobItems = jobList.querySelectorAll('.job-item'); // Get all rendered job items
 
-                    // --- Dynamic population (Simplified and Corrected for Uniqueness) ---
+                    // --- Dynamic population (Corrected for Uniqueness) ---
                     if (jobItems.length > 0) {
                         // Use Maps to store unique entries: Key=Slug, Value=Display Text
                         const uniqueLocations = new Map();
@@ -235,22 +247,17 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listi
                         }
                      }
 
-                    // --- Filtering Logic (Checks individual item's location) ---
+                    // --- Filtering Logic ---
                     function filterJobs() {
                         const currentJobItems = jobList.querySelectorAll('.job-item');
-                        if (currentJobItems.length === 0 && !<?php echo empty($jobs) ? 'true' : 'false'; ?>) {
-                             noJobsMessage.style.display = 'block'; jobList.style.display = 'none';
-                             jobCountDisplay.textContent = '0 Open Positions'; updateClearButtonVisibility(); return;
-                        }
-
-                        const selectedLocation = locationFilter.value; // This is the individual slug
+                        // No need to check initial job count here, filter based on visible items
+                        const selectedLocation = locationFilter.value;
                         const selectedDepartment = departmentFilter.value;
                         let visibleJobsCount = 0;
 
                         currentJobItems.forEach(item => {
                             const itemLocation = item.dataset.location; // Individual location slug
                             const itemDepartment = item.dataset.department;
-
                             const locationMatch = selectedLocation === "" || itemLocation === selectedLocation;
                             const departmentMatch = selectedDepartment === "" || itemDepartment === selectedDepartment;
 
@@ -258,12 +265,22 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listi
                         });
 
                          // Show/hide the 'no jobs found' message
-                        if (visibleJobsCount === 0 && jobItems.length > 0) { noJobsMessage.style.display = 'block'; jobList.style.display = 'none'; } else { noJobsMessage.style.display = 'none'; jobList.style.display = 'grid'; }
+                         const totalRenderedItems = jobItems.length; // Use original count for this check
+                         if (visibleJobsCount === 0 && totalRenderedItems > 0) { // Only show if items existed but none match
+                             noJobsMessage.style.display = 'block'; jobList.style.display = 'none';
+                         } else {
+                             // Make sure list is visible if items exist (even if 0 are visible due to initial empty state)
+                             noJobsMessage.style.display = 'none';
+                             jobList.style.display = totalRenderedItems > 0 ? 'grid' : 'none'; // Hide list if initially empty
+                         }
 
                         // Update job count display heading
                         let countText = visibleJobsCount === 1 ? '1 Open Position' : `${visibleJobsCount} Open Positions`;
-                        jobCountDisplay.textContent = countText;
-                        updateClearButtonVisibility();
+                        // Ensure the heading element itself exists before updating
+                        if (jobCountDisplay) {
+                             jobCountDisplay.textContent = countText;
+                        }
+                        updateClearButtonVisibility(); // Update button visibility after filtering
                     }
 
                     // Event Listeners
@@ -271,8 +288,17 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listi
                     locationFilter.addEventListener('change', filterJobs);
                     departmentFilter.addEventListener('change', filterJobs);
 
-                    // Initial check for clear button visibility
-                    updateClearButtonVisibility();
+                    // === RUN INITIAL FILTER & BUTTON CHECK ===
+                    // Run only if job items actually exist to be filtered/counted
+                    if (jobItems.length > 0) {
+                         filterJobs();
+                    } else {
+                        // If no jobs initially, ensure count is 0 and clear button hidden
+                         if (jobCountDisplay) { jobCountDisplay.textContent = '0 Open Positions'; }
+                         updateClearButtonVisibility();
+                         jobList.style.display = 'none'; // Hide empty grid container
+                    }
+
 
                  })(); // Immediately invoke the function
 			</script>
