@@ -3,8 +3,9 @@
  * Plugin Name:       Job Listings Block
  * Description:       A block to display and manage job listings with filtering.
  * Requires at least: 6.0
+ * Tested up to:      6.8
  * Requires PHP:      7.4
- * Version:           1.1.0
+ * Version:           1.1.1
  * Author:            Boopathi R
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
