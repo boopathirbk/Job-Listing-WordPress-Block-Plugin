@@ -1,4 +1,6 @@
 import { __ } from '@wordpress/i18n';
+// *** ADD useState, useEffect import ***
+import { useState, useEffect } from '@wordpress/element';
 import {
 	useBlockProps,
 	InspectorControls,
@@ -11,16 +13,45 @@ import {
 	SelectControl,
 	Notice,
     __experimentalHeading as Heading,
-    ToggleControl // <-- Added Import
+    ToggleControl
 } from '@wordpress/components';
 import './editor.scss';
+
+// Helper component for the location textarea to manage its own state
+function LocationsTextarea({ initialValue, index, onUpdate }) {
+    // Local state to hold the raw textarea value
+    const [textareaValue, setTextareaValue] = useState(initialValue);
+
+    // Update local state when the initial value (from attributes) changes
+    useEffect(() => {
+        setTextareaValue(initialValue);
+    }, [initialValue]);
+
+    const handleChange = (newValue) => {
+        setTextareaValue(newValue); // Update local state immediately for responsiveness
+        // Update block attribute (parsing happens in updateJob passed via onUpdate)
+        onUpdate(index, 'locationsText', newValue);
+    };
+
+    return (
+        <TextareaControl
+            label={__('Locations (One per line)', 'job-listings-block')}
+            value={textareaValue} // Use local state for value
+            onChange={handleChange} // Use custom handler
+            help={__('Enter each location on a new line. E.g., "City, Country".', 'job-listings-block')}
+            required
+            rows={3} // Default rows, can be adjusted by user resizing
+        />
+    );
+}
+
 
 export default function Edit({ attributes, setAttributes }) {
 	const { jobs = [], hiringOrganizationName, hiringOrganizationUrl } = attributes;
 
 	const blockProps = useBlockProps();
 
-    // --- Job Management Functions ---
+    // --- Helper Functions defined INSIDE the component ---
 	const addJob = () => {
 		const newJobs = [
 			...jobs,
@@ -28,11 +59,11 @@ export default function Edit({ attributes, setAttributes }) {
 				id: `job-${Date.now()}`,
 				title: '',
 				department: '',
-				locations: [], // <-- Changed: Default locations to empty array
+				locations: [],
                 employmentType: 'Full-time',
                 description: '',
 				url: '',
-                openInNewTab: false, // <-- Added: Default link target
+                openInNewTab: false,
 			},
 		];
 		setAttributes({ jobs: newJobs });
@@ -41,12 +72,12 @@ export default function Edit({ attributes, setAttributes }) {
 	const updateJob = (index, key, value) => {
 		const newJobs = jobs.map((job, i) => {
 			if (i === index) {
-                // Handle locations array from textarea
+                // Handle locations array ONLY when processing the temporary key
                 if (key === 'locationsText') {
-                    const locationsArray = value
-                        .split('\n') // Split by newline
-                        .map(loc => loc.trim()) // Trim whitespace
-                        .filter(Boolean); // Remove empty lines
+                     const locationsArray = value
+                        .split('\n')
+                        .map(loc => loc.trim())
+                        .filter(Boolean);
                     return { ...job, locations: locationsArray };
                 }
 				return { ...job, [key]: value };
@@ -60,8 +91,10 @@ export default function Edit({ attributes, setAttributes }) {
 		const newJobs = jobs.filter((_, i) => i !== index);
 		setAttributes({ jobs: newJobs });
 	};
+    // --- End Helper Functions ---
 
-    // --- Department Options (derived from current jobs) ---
+
+    // --- Department Options ---
     const getUniqueDepartments = () => {
         const values = new Set(jobs.map(job => job.department?.trim()).filter(Boolean));
         return Array.from(values).sort().map(value => ({ label: value, value: value }));
@@ -83,7 +116,7 @@ export default function Edit({ attributes, setAttributes }) {
 						label={__('Organization Website URL', 'job-listings-block')}
 						value={hiringOrganizationUrl}
 						onChange={(value) => setAttributes({ hiringOrganizationUrl: value })}
-                        type="url" // Use url type for better validation
+                        type="url"
                         help={__('Used for SEO Schema.', 'job-listings-block')}
 					/>
                 </PanelBody>
@@ -110,14 +143,11 @@ export default function Edit({ attributes, setAttributes }) {
                                 required
 							/>
 
-                            {/* Feature 3: Textarea for Multiple Locations */}
-                            <TextareaControl
-                                label={__('Locations (One per line)', 'job-listings-block')}
-                                value={(job.locations || []).join('\n')} // Join array for textarea display
-                                onChange={(value) => updateJob(index, 'locationsText', value)} // Use temporary key
-                                help={__('Enter each location on a new line. E.g., "City, Country".', 'job-listings-block')}
-                                required
-                                rows={3} // Adjust rows as needed
+                            {/* Use the new helper component */}
+                            <LocationsTextarea
+                                initialValue={(job.locations || []).join('\n')}
+                                index={index}
+                                onUpdate={updateJob} // Pass the update function
                             />
 
                             <SelectControl
@@ -132,6 +162,7 @@ export default function Edit({ attributes, setAttributes }) {
                                 ]}
                                 onChange={(value) => updateJob(index, 'employmentType', value)}
                             />
+                             {/* Short Description */}
                              <TextareaControl
                                 label={__('Short Description (for SEO)', 'job-listings-block')}
                                 value={job.description}
@@ -146,7 +177,7 @@ export default function Edit({ attributes, setAttributes }) {
 								type="url"
 								required
 							/>
-                            {/* Feature 1: Link Target Toggle */}
+                            {/* Link Target Toggle */}
                             <ToggleControl
                                 label={__('Open link in new tab', 'job-listings-block')}
                                 checked={!!job.openInNewTab} // Ensure boolean

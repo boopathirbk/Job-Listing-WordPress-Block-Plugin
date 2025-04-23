@@ -1,6 +1,7 @@
 <?php
 /**
  * PHP file to render the Job Listings Block on the frontend.
+ * v1.1.3 - Corrected filter population logic.
  *
  * @package job-listings-block
  */
@@ -11,17 +12,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Get jobs data from attributes, default to empty array if not set.
-// Sanitize attributes here if necessary, though saved attributes are generally trusted from editor.
 $jobs = isset( $attributes['jobs'] ) && is_array( $attributes['jobs'] ) ? $attributes['jobs'] : array();
 $hiring_org_name = isset($attributes['hiringOrganizationName']) ? sanitize_text_field($attributes['hiringOrganizationName']) : 'Your Company Name';
-$hiring_org_url = isset($attributes['hiringOrganizationUrl']) ? esc_url($attributes['hiringOrganizationUrl']) : ''; // Use esc_url for URLs
+$hiring_org_url = isset($attributes['hiringOrganizationUrl']) ? esc_url($attributes['hiringOrganizationUrl']) : '';
 
-// Generate a unique ID base *once* for this block instance to scope JS/CSS IDs.
+// Generate a unique ID base *once* for this block instance.
 $unique_id_base = uniqid( 'job-block-' );
-$total_jobs_count = count( $jobs ); // Initial total count
 
-// Get block wrapper attributes (for alignment, custom classes, etc.).
-// Using wp_kses_data because it allows safe HTML attributes like class, id, data-*.
+// Calculate initial count based on *rendered items* (job * location count)
+$initial_rendered_item_count = 0;
+foreach ($jobs as $job) {
+    $job_locations_raw = isset( $job['locations'] ) && is_array($job['locations']) ? $job['locations'] : [];
+    // Check if essential fields for rendering are present
+    if (!empty($job['title']) && !empty($job['department']) && !empty($job_locations_raw)) {
+        // Count valid locations (non-empty strings after trim)
+        $valid_locations = array_filter(array_map('trim', $job_locations_raw));
+        $initial_rendered_item_count += count($valid_locations);
+    }
+}
+
 $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listings-block-wrapper' ) );
 
 ?>
@@ -30,10 +39,10 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listi
 
         <h2 id="job-count-<?php echo esc_attr( $unique_id_base ); ?>" class="job-count-heading">
             <?php
-                /* translators: %d: Number of open positions. */ // <-- Translator Comment Correctly Placed
+                /* translators: %d: Number of open positions. */
                 printf(
-                    esc_html( _n( '%d Open Position', '%d Open Positions', $total_jobs_count, 'job-listings-block' ) ),
-                    (int) $total_jobs_count
+                    esc_html( _n( '%d Open Position', '%d Open Positions', $initial_rendered_item_count, 'job-listings-block' ) ),
+                    (int) $initial_rendered_item_count
                 );
             ?>
         </h2>
@@ -55,10 +64,9 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listi
                      <!-- Options populated by JS -->
                </select>
             </div>
-            <?php // Clear Filter Button ?>
-            <button id="clear-filters-<?php echo esc_attr( $unique_id_base ); ?>" class="clear-filters-button" aria-label="<?php esc_attr_e( 'Clear Filters', 'job-listings-block' ); ?>" title="<?php esc_attr_e( 'Clear Filters', 'job-listings-block' ); ?>">
+            <button id="clear-filters-<?php echo esc_attr( $unique_id_base ); ?>" class="clear-filters-button" style="display: none;" aria-label="<?php esc_attr_e( 'Clear Filters', 'job-listings-block' ); ?>" title="<?php esc_attr_e( 'Clear Filters', 'job-listings-block' ); ?>">
                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" /></svg>
-                 <span><?php esc_html_e( 'Clear', 'job-listings-block' ); ?></span>
+                 <span class="clear-filters-button-text"><?php esc_html_e( 'Clear Selection', 'job-listings-block' ); ?></span>
             </button>
         </div>
 
@@ -67,31 +75,35 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listi
 			<!-- Job List -->
 			<div id="job-list-<?php echo esc_attr( $unique_id_base ); ?>" class="job-list" role="list">
 				<?php foreach ( $jobs as $index => $job ) :
-                    // Prepare variables (sanitization/escaping applied on output below)
-                    $job_id = isset( $job['id'] ) ? sanitize_key( $job['id'] ) : 'job-' . $index;
+                    // Prepare job-level variables
+                    $job_id_base = isset( $job['id'] ) ? sanitize_key( $job['id'] ) : 'job-' . $index;
 					$job_title_raw = isset( $job['title'] ) ? $job['title'] : '';
 					$job_department_raw = isset( $job['department'] ) ? trim( $job['department'] ) : '';
                     $job_department_slug = sanitize_title( $job_department_raw );
                     $job_locations_raw = isset( $job['locations'] ) && is_array($job['locations']) ? $job['locations'] : [];
-                    $job_locations_display_array = array_map('esc_html', $job_locations_raw); // Pre-escape for implode safety
-                    $job_location_display = implode(', ', $job_locations_display_array); // This is now HTML-safe
-                    $location_slugs = implode(',', array_map('sanitize_title', $job_locations_raw));
                     $job_employment_type_raw = isset($job['employmentType']) ? $job['employmentType'] : 'Full-time';
                     $job_description_raw = isset($job['description']) ? $job['description'] : '';
 					$job_url_raw = isset( $job['url'] ) ? $job['url'] : '#';
                     $open_in_new_tab = isset($job['openInNewTab']) && $job['openInNewTab'];
-                    // $target_attr variable removed - handled directly in <a> tag
 
-                    // Basic check for essential data before attempting to render item
+                    // Basic check for essential data
                     if (empty($job_title_raw) || empty($job_locations_raw) || empty($job_department_raw)) {
-                        continue;
+                        continue; // Skip this job entirely if core data missing
                     }
+
+                    // Loop through each location to render an item
+                    foreach ($job_locations_raw as $location_index => $single_location) {
+                        $single_location_trimmed = trim($single_location);
+                        if (empty($single_location_trimmed)) continue; // Skip empty location lines
+
+                        $single_location_slug = sanitize_title($single_location_trimmed);
+                        $job_instance_id = $job_id_base . '-' . $single_location_slug;
 				?>
 					<div class="job-item"
-						 data-locations="<?php echo esc_attr( $location_slugs ); ?>"
+						 data-location="<?php echo esc_attr( $single_location_slug ); ?>"
 						 data-department="<?php echo esc_attr( $job_department_slug ); ?>"
                          data-employment-type="<?php echo esc_attr( $job_employment_type_raw ); ?>"
-                         id="<?php echo esc_attr( $job_id ); ?>"
+                         id="<?php echo esc_attr( $job_instance_id ); ?>"
                          role="listitem">
 
 						<div class="job-details">
@@ -101,23 +113,24 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listi
                             </div>
 							<h3 class="job-title"><?php echo esc_html( $job_title_raw ); ?></h3>
                             <?php if (!empty($job_description_raw)): ?>
-                                <?php // Allows basic HTML like <p>, <strong>, <a> etc. defined by wp_kses_post ?>
                                 <p class="job-description-snippet"><?php echo wp_kses_post( $job_description_raw ); ?></p>
                             <?php endif; ?>
 						</div>
 						<div class="job-location-info">
 							<span class="job-location-label"><?php esc_html_e( 'Location', 'job-listings-block' ); ?></span>
-							<span class="job-location"><?php echo esc_html( $job_location_display ); // Escaping the final imploded string ?></span>
+							<span class="job-location"><?php echo esc_html( $single_location_trimmed ); ?></span>
 						</div>
 						<div class="job-link-wrapper">
-                            <?php // Conditionally output target/rel attributes, href is escaped. ?>
 							<a href="<?php echo esc_url( $job_url_raw ); ?>" class="job-link"<?php if ($open_in_new_tab) { echo ' target="_blank" rel="noopener noreferrer"'; } ?>>
 								<?php esc_html_e( 'Learn more', 'job-listings-block' ); ?>
 								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" focusable="false" aria-hidden="true" width="18" height="18"><path fill-rule="evenodd" d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z" clip-rule="evenodd"></path></svg>
 							</a>
 						</div>
 					</div>
-				<?php endforeach; ?>
+				<?php
+                    } // --- End foreach $job_locations_raw ---
+                endforeach; // --- End foreach $jobs ---
+                ?>
 			</div> <!-- End Job List -->
 
              <!-- Message Container for No Results -->
@@ -138,60 +151,45 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listi
 
             foreach ( $jobs as $job ) {
                 $title = isset( $job['title'] ) ? sanitize_text_field( $job['title'] ) : null;
-                 // Use first location for schema or handle multiple if API supports it
                 $job_locations_raw = isset( $job['locations'] ) && is_array($job['locations']) ? $job['locations'] : [];
                 $loc_text = !empty($job_locations_raw) ? sanitize_text_field($job_locations_raw[0]) : null; // Use first location for schema
-
                 $desc = !empty($job['description']) ? wp_kses_post( $job['description'] ) : '<p>' . sanitize_text_field( $job['title'] ) . ' position available.</p>';
                 $url = isset( $job['url'] ) ? esc_url( $job['url'] ) : null;
-                $emp_type = isset($job['employmentType']) ? sanitize_text_field($job['employmentType']) : "Full-time"; // Default to Full-time string
+                $emp_type = isset($job['employmentType']) ? sanitize_text_field($job['employmentType']) : "Full-time";
 
-                if (!$title || !$url) continue; // Skip if essential SEO data missing
+                if (!$title || !$url) continue;
 
                 $schema_item = array(
-                    "@context" => "https://schema.org/",
-                    "@type" => "JobPosting",
-                    "title" => $title,
-                    "description" => $desc, // wp_kses_post applied when preparing var
-                    "hiringOrganization" => $hiring_org,
-                    // Format employmentType for schema.org standards (e.g., FULL_TIME, PART_TIME)
-                    "employmentType" => strtoupper( str_replace( '-', '_', $emp_type ) ),
-                    "datePosted" => $current_date,
-                    "url" => $url,
-                    "jobLocation" => array( "@type" => "Place" )
+                    "@context" => "https://schema.org/", "@type" => "JobPosting", "title" => $title, "description" => $desc,
+                    "hiringOrganization" => $hiring_org, "employmentType" => strtoupper( str_replace( '-', '_', $emp_type ) ),
+                    "datePosted" => $current_date, "url" => $url, "jobLocation" => array( "@type" => "Place" )
                 );
 
-                 if ($loc_text && $loc_text !== 'Multiple Locations') { // Schema often expects one primary location
+                 if ($loc_text && $loc_text !== 'Multiple Locations') {
                      $parts = explode(',', $loc_text);
                      $schema_item['jobLocation']['address'] = array("@type" => "PostalAddress");
                      if(count($parts) > 0) $schema_item['jobLocation']['address']['addressLocality'] = trim($parts[0]);
                      if(count($parts) > 1) $schema_item['jobLocation']['address']['addressCountry'] = trim($parts[count($parts) - 1]);
                  } else if ($loc_text === 'Multiple Locations') {
-                      $schema_item['jobLocationType'] = "TELECOMMUTE"; // Or handle region based - Telecommute is safer guess
-                      if (isset($schema_item['jobLocation']['address'])) unset($schema_item['jobLocation']['address']); // Remove address if multiple/remote
-                      $schema_item['jobLocation']['name'] = "Multiple Locations"; // Use name for multiple
-                 } else {
-                     unset($schema_item['jobLocation']); // Remove location if not specified
-                 }
+                      $schema_item['jobLocationType'] = "TELECOMMUTE";
+                      if (isset($schema_item['jobLocation']['address'])) unset($schema_item['jobLocation']['address']);
+                      $schema_item['jobLocation']['name'] = "Multiple Locations";
+                 } else { unset($schema_item['jobLocation']); }
                 $job_posting_schema[] = $schema_item;
             }
 
             if ( ! empty( $job_posting_schema ) ) {
-                // Using wp_json_encode ensures valid JSON output
                 echo '<script type="application/ld+json">' . wp_json_encode( $job_posting_schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT ) . '</script>';
             }
             // --- End JSON-LD Script ---
             ?>
 
 
-            <!-- Filtering JavaScript -->
+            <!-- Filtering JavaScript (Corrected Population Logic v2) -->
 			<script id="job-filter-script-<?php echo esc_attr( $unique_id_base ); ?>">
 				// Wrap in IIFE to avoid global scope pollution and run immediately
                 (function() {
-                    // Use the unique ID base generated by PHP
                     const uniqueIdBase = '<?php echo esc_js( $unique_id_base ); ?>';
-
-                    // Find elements *specific to this block instance* using the unique IDs
                     const locationFilter = document.getElementById('location-filter-' + uniqueIdBase);
                     const departmentFilter = document.getElementById('department-filter-' + uniqueIdBase);
                     const jobList = document.getElementById('job-list-' + uniqueIdBase);
@@ -199,140 +197,109 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'job-listi
                     const jobCountDisplay = document.getElementById('job-count-' + uniqueIdBase);
                     const clearButton = document.getElementById('clear-filters-' + uniqueIdBase);
 
+                    if (!locationFilter || !departmentFilter || !jobList || !noJobsMessage || !jobCountDisplay || !clearButton) { return; }
 
-                    // Check if all elements were found before proceeding
-                    if (!locationFilter || !departmentFilter || !jobList || !noJobsMessage || !jobCountDisplay || !clearButton) {
-                        return; // Exit if essential elements are missing
-                    }
-
+                    // Get all RENDERED job items (one per location instance)
                     const jobItems = jobList.querySelectorAll('.job-item');
 
-                    // --- Dynamic population (Handles multiple locations) ---
+                    // --- Dynamic population (Simplified and Corrected) ---
                     if (jobItems.length > 0) {
-                        const locations = new Map(); // Store slug -> display text
-                        const departments = new Map();
+                        // Use Maps to store unique entries: Key=Slug, Value=Display Text
+                        const uniqueLocations = new Map();
+                        const uniqueDepartments = new Map();
 
                         jobItems.forEach(item => {
-                            // Handle multiple location slugs/display
-                            const locationSlugs = item.dataset.locations ? item.dataset.locations.split(',') : [];
-                             const locTextEl = item.querySelector('.job-location');
-                             const locFullText = locTextEl ? locTextEl.textContent.trim() : '';
-                             // Use the full comma-separated text for display value lookup in the dropdown
-                             const displayLocationText = locFullText || locSlug.replace(/-/g, ' '); // Fallback if element missing
+                            // Location: Get data directly from the rendered item
+                            const locSlug = item.dataset.location;
+                            const locTextEl = item.querySelector('.job-location');
+                            const locText = locTextEl ? locTextEl.textContent.trim() : locSlug.replace(/-/g, ' '); // Get individual text
 
-                            locationSlugs.forEach((locSlug) => {
-                                if (locSlug && !locations.has(locSlug)) {
-                                    locations.set(locSlug, displayLocationText); // Map slug to full display text
-                                }
-                            });
+                            if (locSlug && !uniqueLocations.has(locSlug)) { // Check slug for uniqueness
+                                uniqueLocations.set(locSlug, locText); // Store Slug -> Text
+                            }
 
-                            // Department
-                            const depValue = item.dataset.department;
+                            // Department: Get data directly from the rendered item
+                            const depSlug = item.dataset.department;
                             const depTextEl = item.querySelector('.job-department');
-                            const depText = depTextEl ? depTextEl.textContent.trim() : null;
-                            if (depValue && depText && !departments.has(depValue)) {
-                                departments.set(depValue, depText);
+                            const depText = depTextEl ? depTextEl.textContent.trim() : depSlug.replace(/-/g, ' ');
+
+                            if (depSlug && !uniqueDepartments.has(depSlug)) { // Check slug for uniqueness
+                                uniqueDepartments.set(depSlug, depText); // Store Slug -> Text
                             }
                         });
 
-                        // Filter out duplicate display texts before sorting and adding options
-                        const uniqueLocationEntries = Array.from(new Map( // Create map from slug -> display text
-                            [...locations.entries()].map(([slug, text]) => [text, slug]) // Reverse: display text -> first slug
-                        ).entries()).map(([text, slug]) => [slug, text]); // Convert back: first slug -> display text
+                        // Sort by Display Text (Value in the Map)
+                        const sortedLocations = [...uniqueLocations.entries()].sort((a, b) => a[1].localeCompare(b[1]));
+                        const sortedDepartments = [...uniqueDepartments.entries()].sort((a, b) => a[1].localeCompare(b[1]));
 
-                        const sortedLocations = uniqueLocationEntries.sort((a, b) => a[1].localeCompare(b[1])); // Sort by display text
-
-                        const uniqueDepartmentEntries = Array.from(new Map(
-                            [...departments.entries()].map(([slug, text]) => [text, slug])
-                        ).entries()).map(([text, slug]) => [slug, text]);
-
-                        const sortedDepartments = uniqueDepartmentEntries.sort((a, b) => a[1].localeCompare(b[1]));
-
-
+                        // Populate dropdowns
                         while (locationFilter.options.length > 1) locationFilter.remove(1);
                         while (departmentFilter.options.length > 1) departmentFilter.remove(1);
 
-                        // Add unique locations based on display text
-                        sortedLocations.forEach(([value, text]) => { // Value is the slug, Text is the display text
+                        sortedLocations.forEach(([slug, text]) => {
                             const option = document.createElement('option');
-                            option.value = value;
-                            option.textContent = text;
+                            option.value = slug; // Use slug for value
+                            option.textContent = text; // Use text for display
                             locationFilter.appendChild(option);
                         });
 
-                        // Add unique departments based on display text
-                        sortedDepartments.forEach(([value, text]) => {
-                            const option = document.createElement('option');
-                            option.value = value;
-                            option.textContent = text;
-                            departmentFilter.appendChild(option);
+                        sortedDepartments.forEach(([slug, text]) => {
+                             const option = document.createElement('option');
+                             option.value = slug;
+                             option.textContent = text;
+                             departmentFilter.appendChild(option);
                         });
                     }
                     // --- End dynamic population ---
 
+                     function updateClearButtonVisibility() {
+                        if (locationFilter.value !== "" || departmentFilter.value !== "") {
+                            clearButton.style.display = 'inline-flex';
+                        } else {
+                            clearButton.style.display = 'none';
+                        }
+                    }
 
-                    // --- Filtering Logic (Handles multiple locations) ---
+                    // --- Filtering Logic (Checks individual item's location) ---
                     function filterJobs() {
                         const currentJobItems = jobList.querySelectorAll('.job-item');
                         if (currentJobItems.length === 0 && !<?php echo empty($jobs) ? 'true' : 'false'; ?>) {
-                             noJobsMessage.style.display = 'block';
-                             jobList.style.display = 'none';
-                             jobCountDisplay.textContent = '0 Open Positions'; // Update count
-                             return;
+                             noJobsMessage.style.display = 'block'; jobList.style.display = 'none';
+                             jobCountDisplay.textContent = '0 Open Positions'; updateClearButtonVisibility(); return;
                         }
 
-                        const selectedLocation = locationFilter.value; // This is the slug
+                        const selectedLocation = locationFilter.value; // This is the individual slug
                         const selectedDepartment = departmentFilter.value;
                         let visibleJobsCount = 0;
 
                         currentJobItems.forEach(item => {
-                            const itemLocationSlugs = item.dataset.locations ? item.dataset.locations.split(',') : [];
+                            const itemLocation = item.dataset.location; // Individual location slug
                             const itemDepartment = item.dataset.department;
 
-                            const locationMatch = selectedLocation === "" || itemLocationSlugs.includes(selectedLocation); // Check if selected slug is IN the list
+                            const locationMatch = selectedLocation === "" || itemLocation === selectedLocation;
                             const departmentMatch = selectedDepartment === "" || itemDepartment === selectedDepartment;
 
-                            if (locationMatch && departmentMatch) {
-                                item.classList.remove('hidden');
-                                visibleJobsCount++;
-                            } else {
-                                item.classList.add('hidden');
-                            }
+                            if (locationMatch && departmentMatch) { item.classList.remove('hidden'); visibleJobsCount++; } else { item.classList.add('hidden'); }
                         });
 
                          // Show/hide the 'no jobs found' message
-                        if (visibleJobsCount === 0 && jobItems.length > 0) { // Only show if jobs existed but none match
-                            noJobsMessage.style.display = 'block';
-                            jobList.style.display = 'none';
-                        } else {
-                            noJobsMessage.style.display = 'none';
-                            jobList.style.display = 'grid';
-                        }
+                        if (visibleJobsCount === 0 && jobItems.length > 0) { noJobsMessage.style.display = 'block'; jobList.style.display = 'none'; } else { noJobsMessage.style.display = 'none'; jobList.style.display = 'grid'; }
 
                         // Update job count display heading
-                        let countText = '';
-                        if (visibleJobsCount === 1) {
-                            countText = '1 Open Position'; // Singular, Title Case
-                        } else {
-                            countText = `${visibleJobsCount} Open Positions`; // Plural, Title Case
-                        }
+                        let countText = visibleJobsCount === 1 ? '1 Open Position' : `${visibleJobsCount} Open Positions`;
                         jobCountDisplay.textContent = countText;
+                        updateClearButtonVisibility();
+                    }
 
-                    } // <-- End of filterJobs function
-
-                    // Clear Button Event Listener
-                    clearButton.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        locationFilter.value = "";
-                        departmentFilter.value = "";
-                        filterJobs();
-                    });
-
-                    // Add event listeners for dropdowns
+                    // Event Listeners (Remain the same)
+                    clearButton.addEventListener('click', function(e) { e.preventDefault(); locationFilter.value = ""; departmentFilter.value = ""; filterJobs(); });
                     locationFilter.addEventListener('change', filterJobs);
                     departmentFilter.addEventListener('change', filterJobs);
 
-                 })(); // Immediately invoke the function
+                    // Initial check for clear button visibility
+                    updateClearButtonVisibility();
+
+                 })();
 			</script>
 
 

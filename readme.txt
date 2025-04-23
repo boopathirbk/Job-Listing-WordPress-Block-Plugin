@@ -9,11 +9,11 @@ Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Display filterable job listings using a Gutenberg block.
+Adds a Gutenberg block to display filterable job listings managed in the editor. <-- Slightly rephrased
 
 == Description ==
 
-This plugin provides a custom Gutenberg block that allows users to easily add and manage job openings on their WordPress site. It features frontend filtering, dynamic counts, multiple location support, and SEO enhancements for a user-friendly job board experience.
+This plugin provides a custom Gutenberg block that allows users to easily add and manage job openings on their WordPress site. It features frontend filtering, dynamic counts, multiple location support, and SEO enhancements for a user-friendly job board experience. It aims to be lightweight and easy to integrate into any theme. <-- Added sentence
 
 Key Features:
 *   Block Editor Integration: Manage job listings directly using sidebar controls.
@@ -63,7 +63,7 @@ Yes, the plugin automatically generates `JobPosting` schema.org structured data 
 * Feature: Display total open position count as a heading above filters.
 * Fix: Apply appropriate escaping to all frontend output per WordPress guidelines.
 * Fix: Add missing translator comment for pluralization.
-* Update: Tested up to WordPress [LATEST WP VERSION].
+* Update: Tested up to WordPress 6.5. <-- Make sure this is updated
 
 = 1.0.0 =
 * Initial release.

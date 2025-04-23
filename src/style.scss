@@ -2,341 +2,136 @@
 .wp-block-job-listings-block {
     // This targets the wrapper added by get_block_wrapper_attributes()
 
-    // Reset and base styles within the container
-    .job-listings-container * {
-        box-sizing: border-box;
-    }
+    .job-listings-container * { box-sizing: border-box; }
+    .job-listings-container { background-color: #fdfaf6; padding: 25px; border-radius: 8px; margin-top: 1em; margin-bottom: 1em; }
 
-    .job-listings-container {
-        // REMOVED: font-family declaration to inherit from theme.
-        background-color: #fdfaf6; // Or choose a background suitable for the theme
-        padding: 25px;
-        border-radius: 8px;
-        margin-top: 1em;
-        margin-bottom: 1em;
-    }
-
-    // === Styling for Job Count Heading ===
+    // Styling for Job Count Heading
     .job-count-heading {
-        font-size: 1.6rem;   // Example heading size (adjust to match theme H2/H3)
-        font-weight: 600;  // Semi-bold heading weight
-        color: #2d1f4c;     // Use a prominent color (e.g., title color)
-        margin-bottom: 25px; // Space below the heading
-        padding-bottom: 15px;// Space before the filter line
-        border-bottom: 1px solid #eee; // Optional separator below heading
-        text-align: left;     // Default alignment
-        line-height: 1.4;
-
-        @media (max-width: 600px) {
-            font-size: 1.5rem; // Slightly smaller on mobile
-            text-align: center; // Center on mobile if desired
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-        }
+        font-size: 1.6rem; font-weight: 600; color: #2d1f4c; margin-bottom: 25px; padding-bottom: 15px;
+        border-bottom: 1px solid #eee; text-align: left; line-height: 1.4;
+        @media (max-width: 600px) { font-size: 1.5rem; text-align: center; margin-bottom: 20px; padding-bottom: 10px; }
     }
 
-    /* Filters Section - Adjusted */
-    .filters-section {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px; // Gap between label/dropdowns/button
-        align-items: center; // Vertically align items
-        margin-bottom: 35px;
-    }
-
-    // Style for the "Filter by" Label
-    .filter-label {
-        font-weight: 500;
-        color: #444;
-        margin-right: 10px; // Add space between label and first dropdown
-        padding-bottom: 0;
-        line-height: 1.3;
-        flex-shrink: 0;
-    }
+    /* Filters Section */
+    .filters-section { display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 35px; }
+    .filter-label { font-weight: 500; color: #444; margin-right: 10px; padding-bottom: 0; line-height: 1.3; flex-shrink: 0; }
 
     // Filter dropdown styles
     .filter-dropdown {
-        display: flex;
-        align-items: center;
-        background-color: #fff;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        padding: 8px 12px;
-        position: relative;
-        min-width: 200px;
-        flex-grow: 1; // Allow dropdowns to grow
-        max-width: 320px; // Limit max width
-
-        svg {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-            fill: #8a3ffc;
-            flex-shrink: 0;
-        }
+        display: flex; align-items: center; background-color: #fff; border: 1px solid #ddd; border-radius: 6px;
+        padding: 8px 12px; position: relative; min-width: 200px; flex-grow: 1; max-width: 320px;
+        svg { width: 20px; height: 20px; margin-right: 10px; fill: #8a3ffc; flex-shrink: 0; }
         select {
-             border: none;
-            outline: none;
-            background-color: transparent;
-            flex-grow: 1;
-            font-size: 1rem;
-            color: #333;
-            font-weight: 500;
-            cursor: pointer;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            padding-right: 30px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%238a3ffc'%3E%3Cpath fill-rule='evenodd' d='M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z' clip-rule='evenodd' /%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 16px 16px;
-            width: 100%;
-            border-radius: 3px;
-            padding-left: 5px;
-
-            &:focus-visible {
-                outline: 2px solid #8a3ffc;
-                outline-offset: 1px;
-                box-shadow: 0 0 0 2px rgba(138, 63, 252, 0.3);
-            }
-            &:focus {
-                outline: 2px solid #8a3ffc;
-                outline-offset: 1px;
-                box-shadow: 0 0 0 2px rgba(138, 63, 252, 0.3);
-            }
+             border: none; outline: none; background-color: transparent; flex-grow: 1; font-size: 1rem; color: #333;
+             font-weight: 500; cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none;
+             padding-right: 30px;
+             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%238a3ffc'%3E%3Cpath fill-rule='evenodd' d='M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z' clip-rule='evenodd' /%3E%3C/svg%3E");
+             background-repeat: no-repeat; background-position: right 10px center; background-size: 16px 16px;
+             width: 100%; border-radius: 3px; padding-left: 5px;
+            &:focus-visible { outline: 2px solid #8a3ffc; outline-offset: 1px; box-shadow: 0 0 0 2px rgba(138, 63, 252, 0.3); }
+            &:focus { outline: 2px solid #8a3ffc; outline-offset: 1px; box-shadow: 0 0 0 2px rgba(138, 63, 252, 0.3); }
         }
     }
 
     // Clear Filters Button Styling
     .clear-filters-button {
-        background-color: #f8f9fa; // Light background
-        border: 1px solid #dee2e6;
-        color: #495057;
-        padding: 8px 12px;
-        border-radius: 6px;
-        cursor: pointer;
-        display: inline-flex;
+        display: inline-flex; // JS toggles between 'none' and 'inline-flex'
         align-items: center;
-        gap: 6px;
-        font-size: 0.9rem;
-        font-weight: 500;
-        margin-left: auto; // Push to the right on wider screens
-        transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-        flex-shrink: 0; // Prevent button from shrinking
+        background-color: #fff;     // Match dropdown
+        border: 1px solid #ddd;     // Match dropdown
+        border-radius: 6px;         // Match dropdown
+        padding: 8px 12px;          // Match dropdown padding
+        min-width: auto;            // Don't force min-width like dropdown
+        color: #333;                // Match select text color
+        font-size: 1rem;            // Match select font size
+        font-weight: 500;           // Match select font weight
+        line-height: 1.4;           // Match select line height (adjust if needed based on font)
+        cursor: pointer;
+        margin-left: 5px;           // Space after last dropdown
+        transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+        flex-shrink: 0;
 
         svg {
-            width: 16px;
-            height: 16px;
-            display: block; // Ensure SVG aligns well
+            width: 20px;            // Match dropdown icon size
+            height: 20px;
+            fill: #8a3ffc;         // Icon color (purple)
+            flex-shrink: 0;
+            display: block;
+            margin-right: 10px;     // Add space between icon and text like dropdown
         }
-        span { // Target the text span specifically
-            line-height: 1; // Prevent extra spacing
+        span.clear-filters-button-text {
+             line-height: 1.4;       // Match select line height
+             flex-grow: 1;          // Allow text to take space if needed
         }
 
         &:hover {
-            background-color: #e9ecef;
+            background-color: #f8f9fa;
             border-color: #ced4da;
+            color: #333;
+             svg { fill: #6a2ac8; } // Darker icon on hover
         }
 
-        &:focus-visible {
-            outline: 2px solid #8a3ffc; // Use focus color
-            outline-offset: 1px;
-            box-shadow: 0 0 0 2px rgba(138, 63, 252, 0.3);
-        }
-        &:focus { // Fallback
-             outline: 2px solid #8a3ffc;
-             outline-offset: 1px;
-             box-shadow: 0 0 0 2px rgba(138, 63, 252, 0.3);
-        }
+        &:focus-visible { outline: 2px solid #8a3ffc; outline-offset: 1px; box-shadow: 0 0 0 2px rgba(138, 63, 252, 0.3); }
+        &:focus { outline: 2px solid #8a3ffc; outline-offset: 1px; box-shadow: 0 0 0 2px rgba(138, 63, 252, 0.3); }
 
         @media (max-width: 767px) { // Adjust breakpoint maybe?
-            margin-left: 0; // Don't push right when stacked
-            width: 100%; // Make full width below filters
-            justify-content: center; // Center content
-            margin-top: 10px; // Space above button
+            margin-left: 0;
+            width: 100%;
+            justify-content: center;
+            margin-top: 10px;
         }
     }
 
     /* Job List */
-    .job-list {
-        display: grid;
-        gap: 1px;
-        background-color: #eee; // Line color
-        border: 1px solid #eee;
-        border-radius: 6px;
-        overflow: hidden;
-    }
-
-    /* Individual Job Item */
+    .job-list { display: grid; gap: 1px; background-color: #eee; border: 1px solid #eee; border-radius: 6px; overflow: hidden; }
     .job-item {
-        background-color: #fff;
-        padding: 25px;
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 15px 20px;
-        align-items: center;
-        transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out, padding 0.3s ease-in-out, margin 0.3s ease-in-out, visibility 0s linear 0.3s;
-        overflow: hidden;
-
-        &.hidden {
-            opacity: 0;
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-            margin-top: -1px !important;
-            border-width: 0 !important;
-            max-height: 0 !important;
-            pointer-events: none;
-            visibility: hidden;
-            transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out, padding 0.3s ease-in-out, margin 0.3s ease-in-out, visibility 0s linear 0.3s;
-        }
+        background-color: #fff; padding: 25px; display: grid; grid-template-columns: 1fr; gap: 15px 20px;
+        align-items: center; transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out, padding 0.3s ease-in-out, margin 0.3s ease-in-out, visibility 0s linear 0.3s; overflow: hidden;
+        &.hidden { opacity: 0; padding-top: 0 !important; padding-bottom: 0 !important; margin-top: -1px !important; border-width: 0 !important; max-height: 0 !important; pointer-events: none; visibility: hidden; transition: opacity 0.3s ease-in-out, max-height 0.3s ease-in-out, padding 0.3s ease-in-out, margin 0.3s ease-in-out, visibility 0s linear 0.3s; }
     }
-
-     /* Job Details Area */
     .job-details { }
-
-    // Spacing container for tags
-     .job-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0;
-        margin-bottom: 8px;
+    .job-meta { display: flex; flex-wrap: wrap; gap: 0; margin-bottom: 8px; }
+    .job-department, .job-employment-type {
+        font-size: 0.8rem; color: #ffffff; font-weight: 500; background-color: #8a3ffc; border-radius: 12px; padding: 4px 12px;
+        line-height: 1.4; text-align: center; display: inline-block; margin-right: 8px; margin-bottom: 5px; border: none;
     }
-
-    // Style metadata tags like rounded labels
-    .job-department,
-    .job-employment-type {
-        font-size: 0.8rem;
-        color: #ffffff;
-        font-weight: 500;
-        background-color: #8a3ffc;
-        border-radius: 12px;
-        padding: 4px 12px;
-        line-height: 1.4;
-        text-align: center;
-        display: inline-block;
-        margin-right: 8px;
-        margin-bottom: 5px;
-        border: none;
-    }
-
-
-    // Style Job Title
-    .job-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #2d1f4c;
-        margin-bottom: 8px;
-    }
-
-    /* Description snippet */
-    .job-description-snippet {
-        display: none;
-        font-size: 0.9rem;
-        color: #555;
-        margin-top: 5px;
-        margin-bottom: 10px;
-        line-height: 1.5;
-    }
-
-     /* Location Info Area */
-    .job-location-info {
-       text-align: left;
-    }
-
-   // Style Location Label
-   .job-location-label {
-        font-size: 0.95rem;
-        color: #5a6168;
-        font-weight: 400;
-        display: block;
-        margin-bottom: 4px;
-    }
-
-    // Style Location Value
-    .job-location {
-        font-weight: 700;
-        color: #2d1f4c;
-        font-size: 1rem;
-    }
-
-    /* Link Wrapper Area */
-    .job-link-wrapper {
-        text-align: left;
-    }
-
-    // Style Learn More link
+    .job-title { font-size: 1.25rem; font-weight: 700; color: #2d1f4c; margin-bottom: 8px; }
+    .job-description-snippet { display: none; font-size: 0.9rem; color: #555; margin-top: 5px; margin-bottom: 10px; line-height: 1.5; }
+    .job-location-info { text-align: left; }
+    .job-location-label { font-size: 0.95rem; color: #5a6168; font-weight: 400; display: block; margin-bottom: 4px; }
+    .job-location { font-weight: 700; color: #2d1f4c; font-size: 1rem; }
+    .job-link-wrapper { text-align: left; }
     .job-link {
-        display: inline-flex;
-        align-items: center;
-        text-decoration: none;
-        color: #8a3ffc;
-        font-weight: 600;
-        transition: color 0.2s ease, box-shadow 0.2s ease, outline 0.2s ease;
-        white-space: nowrap;
-        border-radius: 3px;
-        padding: 2px 4px;
-        margin: -2px -4px;
-
-        &:focus-visible {
-            outline: 2px solid #8a3ffc;
-            outline-offset: 1px;
-            box-shadow: 0 0 0 2px rgba(138, 63, 252, 0.3);
-        }
-        &:focus {
-            outline: 2px solid #8a3ffc;
-            outline-offset: 1px;
-            box-shadow: 0 0 0 2px rgba(138, 63, 252, 0.3);
-        }
-
-        &:hover {
-            color: #6a2ac8;
-            text-decoration: underline;
-            svg { transform: translateX(3px); }
-        }
+        display: inline-flex; align-items: center; text-decoration: none; color: #8a3ffc; font-weight: 600;
+        transition: color 0.2s ease, box-shadow 0.2s ease, outline 0.2s ease; white-space: nowrap; border-radius: 3px;
+        padding: 2px 4px; margin: -2px -4px;
+        &:focus-visible { outline: 2px solid #8a3ffc; outline-offset: 1px; box-shadow: 0 0 0 2px rgba(138, 63, 252, 0.3); }
+        &:focus { outline: 2px solid #8a3ffc; outline-offset: 1px; box-shadow: 0 0 0 2px rgba(138, 63, 252, 0.3); }
+        &:hover { color: #6a2ac8; text-decoration: underline; svg { transform: translateX(3px); } }
         [dir="rtl"] &:hover svg { transform: translateX(-3px); }
-
-        svg {
-            width: 18px;
-            height: 18px;
-            margin-left: 6px;
-            transition: transform 0.2s ease;
-            flex-shrink: 0;
-            fill: currentColor;
-            [dir="rtl"] & { margin-left: 0; margin-right: 6px; }
-        }
+        svg { width: 18px; height: 18px; margin-left: 6px; transition: transform 0.2s ease; flex-shrink: 0; fill: currentColor; [dir="rtl"] & { margin-left: 0; margin-right: 6px; } }
     }
 
     /* --- Responsive Adjustments --- */
     @media (min-width: 768px) {
-        .job-item {
-            grid-template-columns: minmax(0, 3fr) minmax(0, 1.5fr) minmax(0, 1fr);
-            gap: 15px 30px;
-            align-items: center;
-        }
+        .job-item { grid-template-columns: minmax(0, 3fr) minmax(0, 1.5fr) minmax(0, 1fr); gap: 15px 30px; align-items: center; }
         .job-location-info { text-align: left; }
         .job-link-wrapper { text-align: right; margin-top: 0; }
     }
     @media (max-width: 600px) {
-        // Count heading responsive styles are within its own rule above
+        // Count heading responsive handled above
         .filters-section { align-items: stretch; gap: 10px; }
         .filter-label { margin-bottom: 5px; margin-right: 0; text-align: center; [dir="rtl"] & { margin-left: 0; } }
         .filter-dropdown { max-width: none; }
-        // Clear button responsive styles are within its own rule above
+        // Clear button responsive handled above
         .job-item { padding: 20px; }
         .job-link-wrapper { margin-top: 10px; text-align: left; [dir="rtl"] & { text-align: right; } }
     }
 
      // Styling for the "No Jobs Found" message
     .no-jobs-found-message {
-        text-align: center;
-        padding: 40px 20px;
-        font-size: 1.3rem;
-        font-weight: 500;
-        color: #2d1f4c;
-        margin-top: 20px;
-        // Removed border-top, relies on heading border
-        display: none;
+        text-align: center; padding: 40px 20px; font-size: 1.3rem; font-weight: 500; color: #2d1f4c;
+        margin-top: 20px; /* Removed border-top */; display: none;
     }
 
 } // End of .wp-block-job-listings-block wrapper
