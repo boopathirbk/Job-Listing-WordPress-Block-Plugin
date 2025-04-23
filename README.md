@@ -2,9 +2,15 @@
 
 A WordPress block plugin to display and manage filterable job listings directly within the block editor, rendering separate entries for jobs with multiple locations.
 
-[![License: GPL v2 or later](https://img.shields.io/badge/License-GPL%20v2%20or%20later-blue.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
+[![License: GPL v2 or later](https://img.shields.io/badge/License-GPL%20v2%20or%20later-blue.svg)](https://www.gnu.org/licenses/gpl-2.0.html) [![Donate](https://img.shields.io/badge/Donate-PayPal-blue.svg)](https://paypal.me/boopathirbk)
 
 This plugin provides a custom Gutenberg block that allows users to easily add and manage job openings on their WordPress site. It features frontend filtering, dynamic counts, support for multiple locations per job (displaying each as a unique filterable item), and SEO enhancements.
+
+## Support This Plugin
+
+If you find this plugin useful, please consider supporting its development with a small donation. Thank you!
+
+[**Donate via PayPal**](https://paypal.me/boopathirbk)
 
 ## Features
 
